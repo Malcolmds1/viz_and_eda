@@ -1,0 +1,45 @@
+---
+title: "Visualization"
+subtitle: "Part II"
+output: github_document
+---
+
+```{r setup}
+library(tidyverse)
+library(patchwork)
+```
+
+## Load the weather data
+
+```{r}
+library(p8105.datasets)
+data("weather_df")
+```
+
+
+## Remember this plot...?
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .5)
+```
+
+
+## Labels
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .5) +
+  labs(
+    title = "Temperature plot (C)",
+    x = "Minimum daily temperature (C)",
+    y = "Maximum daily temperature (C)",
+    caption = "Data from rnoaa package; temperature in 2017."
+  )
+```
+
+
+
+
