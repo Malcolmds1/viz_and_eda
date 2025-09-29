@@ -41,3 +41,33 @@ weather_df %>%
   group_by(name, month) 
 ```
 
+## counting things
+
+count month / name observations
+
+```{r}
+weather_df %>% 
+  group_by(name, month) %>% 
+  summarize(n_obs = n())
+```
+
+we can use `count()`
+
+```{r}
+weather_df %>% 
+  count(name, month, name = "n_obs")
+```
+
+*** NEVER *** use base R's `table`
+
+```{r eval = FALSE}
+weather_df %>% 
+  pull(month) %>% 
+  table()
+```
+
+
+
+
+
+
