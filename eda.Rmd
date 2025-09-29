@@ -68,6 +68,127 @@ weather_df %>%
 
 
 
+other helpful counters
+
+```{r}
+weather_df %>% 
+  group_by(name, month) %>% 
+  summarize(n_obs = n(),
+  n_days = n_distinct(date))
+```
+
+
+## A digression on 2x2 tables
+
+```{r}
+weather_df |> 
+  drop_na(tmax) |> 
+  mutate(
+    cold = case_when(
+      tmax <  5 ~ "cold",
+      tmax >= 5 ~ "not_cold",
+      TRUE      ~ ""
+  )) |> 
+  filter(name != "Molokai_HI") |> 
+  group_by(name, cold) |> 
+  summarize(count = n())
+```
+
+```{r}
+weather_df |> 
+  drop_na(tmax) |> 
+  mutate(cold = case_when(
+    tmax <  5 ~ "cold",
+    tmax >= 5 ~ "not_cold",
+    TRUE     ~ ""
+  )) |> 
+  filter(name != "Molokai_HI") |> 
+  janitor::tabyl(name, cold)
+```
+
+
+## General summaries
+
+You can do lots of summaries.
+
+```{r}
+weather_df |>
+  group_by(month) |>
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    mean_prec = mean(prcp, na.rm = TRUE),
+    median_tmax = median(tmax),
+    sd_tmax = sd(tmax))
+```
+
+This is a dataframe! So we can make a plot.
+
+```{r}
+weather_df |>
+  group_by(name, month) |>
+  summarize(mean_tmax = mean(tmax, na.rm = TRUE)) |>
+  ggplot(aes(x = month, y = mean_tmax, color = name)) +
+    geom_point() + geom_line() + 
+    theme(legend.position = "bottom")
+```
+
+Suppose you want to summarize many columns.
+
+```{r}
+weather_df %>% 
+  group_by(name, month) %>% 
+  summarize(across(prcp:tmin, mean))
+```
+
+Reminder: sometimes your results are easier to read in another
+
+```{r}
+weather_df |>
+  group_by(name, month) |>
+  summarize(mean_tmax = mean(tmax, na.rm = TRUE)) |> 
+  pivot_wider(
+    names_from = name,
+    values_from = mean_tmax) |> 
+  knitr::kable(digits = 1)
+```
+
+## `group_by` and `mutate`
+
+```{r}
+weather_df |>
+  group_by(name) |>
+  mutate(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    centered_tmax = tmax - mean_tmax) |> 
+  ggplot(aes(x = date, y = centered_tmax, color = name)) + 
+    geom_point() 
+```
+
+what about window functions
+
+```{r}
+weather_df |>
+  group_by(name, month) |>
+  mutate(temp_ranking = min_rank(tmax))
+```
+
+```{r}
+weather_df |>
+  group_by(name, month) |>
+  filter(min_rank(tmax) < 2)
+```
+
+```{r}
+weather_df |>
+  group_by(name) |>
+  mutate(temp_change = tmax - lag(tmax)) |>
+  summarize(
+    temp_change_sd = sd(temp_change, na.rm = TRUE),
+    temp_change_max = max(temp_change, na.rm = TRUE))
+```
+
+
+
 
 
 
